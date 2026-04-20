@@ -108,6 +108,28 @@ npm run build
 - 推荐浏览器：Chrome
 - 显示问题：请自行调整浏览器窗口的宽高比。
 
+### GitHub Pages 分享
+
+项目支持部署到 GitHub Pages，并通过 URL 参数为任意 Github 仓库生成交互式大屏：
+
+```text
+https://<github-user>.github.io/<repo-name>/#/?repo=<owner>/<repo>
+```
+
+例如：
+
+```text
+https://0213cc.github.io/king_of_disgust/#/?repo=ant-design/ant-design
+```
+
+其他用户可以在 README 中放一个徽章或链接，点击后跳转到可交互大屏：
+
+```md
+[![OpenDigger Dashboard](https://img.shields.io/badge/OpenDigger-Dashboard-6c07f1)](https://0213cc.github.io/king_of_disgust/#/?repo=ant-design/ant-design)
+```
+
+部署和使用说明见：[GitHub Pages 交互式大屏分享方案](docs/github-pages-share.md)。
+
 ## 项目特点
 
 1. 响应式设计

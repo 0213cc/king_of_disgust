@@ -539,7 +539,8 @@ export default {
       handler: async function (newVal) {
         this.cdata = await this.fetchData('https://oss.x-lab.info/open_digger/github/' + newVal);
       },
-      deep: true
+      deep: true,
+      immediate: true
     }
   },
 }

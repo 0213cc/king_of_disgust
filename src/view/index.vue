@@ -81,6 +81,26 @@
             </dv-border-box-1>
           </div>
         </div>
+        <el-popover placement="left" :width="460" trigger="click">
+          <template #reference>
+            <el-button class="share-entry" type="primary">分享</el-button>
+          </template>
+          <div class="share-content">
+            <div class="share-title">复制到 README</div>
+            <div class="share-desc">README 中展示入口，点击后进入可交互大屏。</div>
+            <el-input
+              :model-value="badgeMarkdown"
+              type="textarea"
+              :rows="3"
+              readonly
+            />
+            <div class="share-actions">
+              <el-button type="primary" size="small" @click="copyShareText(badgeMarkdown)">复制徽章</el-button>
+              <el-button size="small" @click="copyShareText(linkMarkdown)">复制链接</el-button>
+              <el-button size="small" @click="copyShareText(shareUrl)">复制 URL</el-button>
+            </div>
+          </div>
+        </el-popover>
       </div>
     </dv-full-screen-container>
   </div>
@@ -125,6 +145,26 @@ export default {
     cloud,
     CodeChangeChart
   },
+  computed: {
+    currentRepository() {
+      return this.$store.state.currentRepository
+    },
+    shareUrl() {
+      if (typeof window === 'undefined') return ''
+      const baseUrl = `${window.location.origin}${window.location.pathname}`
+      return `${baseUrl}#/?repo=${encodeURIComponent(this.currentRepository)}`
+    },
+    badgeMarkdown() {
+      const badgeUrl = 'https://img.shields.io/badge/OpenDigger-Dashboard-6c07f1'
+      return `[![OpenDigger Dashboard](${badgeUrl})](${this.shareUrl})`
+    },
+    linkMarkdown() {
+      return `[查看 ${this.currentRepository} 交互式数据大屏](${this.shareUrl})`
+    }
+  },
+  created() {
+    this.applyRepositoryFromRoute()
+  },
   mounted() {
     this.timeFn()
     this.cancelLoading()
@@ -147,7 +187,28 @@ export default {
       }, 500)
     },
     setCurrentRepository() {
-      this.$store.commit('setCurrentRepository', this.value)
+      this.setRepository(this.value)
+    },
+    applyRepositoryFromRoute() {
+      const repo = this.$route.query.repo
+      if (repo && typeof repo === 'string') {
+        this.$store.commit('setCurrentRepository', repo)
+        this.state1 = repo
+      }
+    },
+    setRepository(repository) {
+      if (!repository) return
+      this.$store.commit('setCurrentRepository', repository)
+      this.state1 = repository
+      if (this.$route.query.repo !== repository) {
+        this.$router.replace({
+          path: '/',
+          query: {
+            ...this.$route.query,
+            repo: repository
+          }
+        }).catch(() => {})
+      }
     },
     querySearch(queryString, cb) {
       var repositories = this.repositories.map(item => {
@@ -165,15 +226,35 @@ export default {
         return (repository.value.indexOf(queryString) === 0);
       };
     },
-    handleSelect(item) {
+    async handleSelect(item) {
       if(typeof item == 'string') {
         if (this.state1) {
-          if (this.checkRepoValidity(this.state1)) {
-            this.$store.commit('setCurrentRepository', this.state1)
+          if (await this.checkRepoValidity(this.state1)) {
+            this.setRepository(this.state1)
           }
         }
       } else {
-        this.$store.commit('setCurrentRepository', item.value)
+        this.setRepository(item.value)
+      }
+    },
+    async copyShareText(text) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text)
+        } else {
+          const textarea = document.createElement('textarea')
+          textarea.value = text
+          textarea.style.position = 'fixed'
+          textarea.style.left = '-9999px'
+          document.body.appendChild(textarea)
+          textarea.focus()
+          textarea.select()
+          document.execCommand('copy')
+          document.body.removeChild(textarea)
+        }
+        this.$message.success('已复制')
+      } catch (error) {
+        this.$message.error('复制失败，请手动复制')
       }
     },
     checkRepoValidity(link) {
@@ -189,9 +270,14 @@ export default {
           .catch(() => {
             this.$message.error('您输入的仓库名无效, 请检查后重新输入');
             return 0;
-          });
+      });
     }
   },
+  watch: {
+    '$route.query.repo'() {
+      this.applyRepositoryFromRoute()
+    }
+  }
 }
 </script>
 
@@ -251,5 +337,35 @@ export default {
   inset: 0;
   z-index: 10;
   transform: translateZ(0);
+}
+
+.share-entry {
+  position: absolute;
+  right: 1.5vw;
+  bottom: 1.5vh;
+  z-index: 20;
+}
+
+.share-content {
+  color: #303133;
+}
+
+.share-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.share-desc {
+  font-size: 13px;
+  color: #606266;
+  margin-bottom: 12px;
+}
+
+.share-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
 }
 </style>
