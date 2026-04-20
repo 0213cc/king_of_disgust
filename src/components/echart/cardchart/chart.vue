@@ -48,8 +48,44 @@ export default {
                 this.updateChartData(this.cdata)
             }
         },
+        formatNumber(value) {
+            if (value === null || value === undefined) return '0'
+            return Number(value).toLocaleString()
+        },
+        getMetricLabel(type) {
+            const labels = {
+                star: 'Star',
+                fork: 'Fork',
+                issue: 'Issue',
+                request: 'PR'
+            }
+            return labels[type] || type
+        },
+        getRobustMax(values) {
+            const validValues = values
+                .filter(value => Number.isFinite(value) && value > 0)
+                .sort((a, b) => a - b)
+
+            if (!validValues.length) return 1
+
+            const p95Index = Math.floor((validValues.length - 1) * 0.95)
+            return Math.max(validValues[p95Index], validValues[validValues.length - 1] * 0.35, 1)
+        },
+        normalizeValue(value, robustMax) {
+            if (!value || value <= 0) return 0
+            return Math.min(Math.log1p(value) / Math.log1p(robustMax), 1)
+        },
+        getGradientColor(ratio) {
+            const start = [180, 140, 240]
+            const end = [100, 0, 180]
+            const color = start.map((channel, index) => Math.round(channel + (end[index] - channel) * ratio))
+            return `rgb(${color.join(',')})`
+        },
         updateChartData(newData) {
-            const currentData = newData[this.currentType + 'data']
+            const currentData = newData[this.currentType + 'data'] || []
+            const values = currentData.map(item => Number(item[2]) || 0)
+            const robustMax = this.getRobustMax(values)
+            const metricLabel = this.getMetricLabel(this.currentType)
             
             this.options = {
                 title: {
@@ -58,13 +94,12 @@ export default {
 
                 polar: {},
                 tooltip: {
-                    formatter: function (params) {
+                    formatter: (params) => {
+                        const year = newData.year?.[params.value[0]] || ''
+                        const month = newData.months?.[params.value[1]] || ''
                         return (
-                            params.value[2] +
-                            ' commits in ' +
-                            newData.months[params.value[1]] +
-                            ' of ' +
-                            newData.year[params.value[0]]
+                            `${year} ${month}<br/>` +
+                            `${metricLabel}: ${this.formatNumber(params.value[2])}`
                         );
                     }
                 },
@@ -94,46 +129,19 @@ export default {
                         name: 'Punch Card',
                         type: 'scatter',
                         coordinateSystem: 'polar',
-                        symbolSize: function (val) {
-                            const minSize = 1;  // 最小点大小
-                            const maxSize = 30; // 最大点大小
-                            const value = val[2];
-                            
-                            // 如果数值为0，直接返回最小大小
-                            if (value === 0) return minSize;
-                            
-                            // 线性映射函数
-                            return minSize + (maxSize - minSize) * (Math.log(value + 1) / Math.log(1000));
+                        symbolSize: (val) => {
+                            const minSize = 3
+                            const maxSize = 28
+                            const ratio = this.normalizeValue(Number(val[2]) || 0, robustMax)
+                            return ratio === 0 ? minSize : minSize + (maxSize - minSize) * ratio
                         },
                         itemStyle: {
-                            color: function(params) {
-                                const value = params.value[2];
-                                
-                                // 定义颜色断点
-                                const colorStops = [
-                                    { value: 0, color: 'rgb(180, 140, 240)' },    // 最小值：浅紫色
-                                    { value: 50, color: 'rgb(160, 80, 220)' },    // 中小值：中紫色
-                                    { value: 200, color: 'rgb(140, 40, 200)' },   // 中大值：深紫色
-                                    { value: 500, color: 'rgb(100, 0, 180)' }     // 最大值：暗紫色
-                                ];
-                                
-                                // 找到value所在的区间
-                                let startColor, endColor, startValue, endValue;
-                                for (let i = 0; i < colorStops.length - 1; i++) {
-                                    if (value >= colorStops[i].value && value <= colorStops[i + 1].value) {
-                                        startColor = colorStops[i].color;
-                                        endColor = colorStops[i + 1].color;
-                                        startValue = colorStops[i].value;
-                                        endValue = colorStops[i + 1].value;
-                                        break;
-                                    }
-                                }
-                                
-                                // 如果超出最大值，使用最深的颜色
-                                if (!startColor) {
-                                    startColor = endColor = colorStops[colorStops.length - 1].color;
-                                }
-                                
+                            color: (params) => {
+                                const value = Number(params.value[2]) || 0
+                                const ratio = this.normalizeValue(value, robustMax)
+                                const startColor = this.getGradientColor(ratio * 0.55)
+                                const endColor = this.getGradientColor(ratio)
+
                                 return new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
                                     {
                                         offset: 0,

@@ -85,24 +85,44 @@ export default {
             }
             return categoryData;
         },
+        getMonthlyValues() {
+            return Object.values(this.cdata.monthlyData || {})
+                .map(value => Number(value) || 0)
+                .filter(value => value > 0)
+                .sort((a, b) => a - b)
+        },
+        getRobustMax() {
+            const values = this.getMonthlyValues()
+            if (!values.length) return 1
+
+            const p95Index = Math.floor((values.length - 1) * 0.95)
+            return Math.max(values[p95Index], values[values.length - 1] * 0.35, 1)
+        },
+        getDisplayWidth(value) {
+            if (!value || value <= 0) return 0
+
+            const minWidth = 90
+            const maxWidth = 760
+            const ratio = Math.min(Math.log1p(value) / Math.log1p(this.getRobustMax()), 1)
+            return minWidth + (maxWidth - minWidth) * ratio
+        },
+        formatNumber(value) {
+            return Number(value || 0).toLocaleString()
+        },
         makeSeriesData(currentMonth, negative) {
             if (!currentMonth || !this.cdata.monthlyData[currentMonth]) {
                 return [];
             }
             
-            const value = this.cdata.monthlyData[currentMonth];
+            const value = Number(this.cdata.monthlyData[currentMonth]) || 0;
+            const displayWidth = this.getDisplayWidth(value);
             const seriesData = [];
             
             for (let i = 0; i < this.lineCount; i++) {
                 let sign = negative ? -1 * (i % 3 ? 0.9 : 1) : 1 * ((i + 1) % 3 ? 0.9 : 1);
+                const laneWeight = 1 - Math.abs(i - this.lineCount / 2 + 0.5) / this.lineCount;
                 seriesData.push({
-                    value: sign * (
-                        value <= 10
-                            ? Math.abs(i - this.lineCount / 2 + 0.5) < this.lineCount / 5
-                                ? value * 10
-                                : 0
-                            : (this.lineCount - Math.abs(i - this.lineCount / 2 + 0.5)) * value
-                    ),
+                    value: sign * displayWidth * Math.max(laneWeight, 0.15),
                     symbolOffset: i % 2 ? ['50%', 0] : undefined
                 });
             }
@@ -114,8 +134,25 @@ export default {
             }
             
             const currentMonth = this.months[this.currentIndex];
+            const currentValue = this.cdata.monthlyData[currentMonth] || 0;
             const option = {
                 color: ['#e54035'],
+                tooltip: {
+                    formatter: () => `${currentMonth}<br/>贡献者数: ${this.formatNumber(currentValue)}`
+                },
+                graphic: [
+                    {
+                        type: 'text',
+                        left: 'center',
+                        bottom: 8,
+                        style: {
+                            text: `贡献者数: ${this.formatNumber(currentValue)}`,
+                            fill: '#006400',
+                            fontSize: 22,
+                            fontWeight: 700
+                        }
+                    }
+                ],
                 xAxis: {
                     axisLine: { show: false },
                     axisLabel: { show: false },
@@ -129,8 +166,8 @@ export default {
                         fontSize: 30,
                         fontFamily: 'Arial'
                     },
-                    min: -2800,
-                    max: 2800
+                    min: -1000,
+                    max: 1000
                 },
                 yAxis: {
                     data: this.makeCategoryData(),
@@ -138,7 +175,7 @@ export default {
                 },
                 grid: {
                     top: 'center',
-                    height: 280
+                    height: 250
                 },
                 series: [
                     {
