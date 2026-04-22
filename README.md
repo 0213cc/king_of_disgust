@@ -1,116 +1,90 @@
-# Github 开源项目数据可视化大屏
+# King of Disgust
 
-本项目是一个基于 Vue 3 的 Github 开源项目数据可视化大屏展示系统。通过调用 OpenDigger API，实时展示 Github 项目的各项数据指标，包括 Star、Fork、Issue、PR 等数据的统计和分析。
+> 面向 GitHub 仓库的交互式开源数据可视化大屏。
 
-## 技术栈
+<p align="center">
+  <a href="https://github.com/0213cc/king_of_disgust/stargazers">
+    <img src="https://img.shields.io/github/stars/0213cc/king_of_disgust?style=for-the-badge" alt="stars" />
+  </a>
+  <a href="https://github.com/0213cc/king_of_disgust/network/members">
+    <img src="https://img.shields.io/github/forks/0213cc/king_of_disgust?style=for-the-badge" alt="forks" />
+  </a>
+  <a href="https://github.com/0213cc/king_of_disgust/issues">
+    <img src="https://img.shields.io/github/issues/0213cc/king_of_disgust?style=for-the-badge" alt="issues" />
+  </a>
+  <a href="https://github.com/0213cc/king_of_disgust">
+    <img src="https://img.shields.io/badge/Vue%203-DataV-6c07f1?style=for-the-badge" alt="vue3 datav" />
+  </a>
+</p>
 
-### 前端框架
-- Vue 3.2.13 - 渐进式 JavaScript 框架
-- Vue Router 4.5.0 - 官方路由管理器
-- Vuex 4.1.0 - 状态管理模式和库
+<p align="center">
+  <a href="https://0213cc.github.io/king_of_disgust/"><strong>在线预览</strong></a>
+  ·
+  <a href="https://0213cc.github.io/king_of_disgust/#/?repo=ant-design/ant-design"><strong>示例大屏</strong></a>
+  ·
+  <a href="https://github.com/0213cc/king_of_disgust/issues"><strong>反馈问题</strong></a>
+</p>
 
-### UI 组件
-- Element Plus 2.4.0 - 基于 Vue 3 的组件库
-- DataV 2.10.0 - 数据可视化组件库
+`King of Disgust` 是一个基于 Vue 3 构建的 GitHub 开源项目数据看板。它通过 OpenDigger 数据接口，将仓库的活跃度、代码变更、贡献者分布等指标组织成适合展示、分享和快速浏览的大屏视图。
 
-### 可视化工具
-- ECharts 5.5.1 - 开源可视化图表库
-- echarts-wordcloud 2.1.0 - 词云图插件
-- echarts-liquidfill 3.1.0 - 水球图插件
+## Preview
 
-### 开发工具
-- Vue CLI - 项目脚手架
-- Sass/SCSS - CSS 预处理器
-- ESLint - 代码检查工具
+在线访问入口：
 
-### 网络请求
-- Axios 1.7.9 - 基于 promise 的 HTTP 库
+- 项目首页：https://0213cc.github.io/king_of_disgust/
+- 示例仓库：https://0213cc.github.io/king_of_disgust/#/?repo=ant-design/ant-design
 
-### 其他工具
-- v-scale-screen 2.3.0 - 大屏自适应组件
-- core-js - JavaScript 标准库
+进入页面后，输入任意 GitHub 仓库名 `owner/repo` 即可切换数据大屏。
 
-### 构建工具
-- @vue/cli-service - Vue CLI 的核心服务
-- babel - JavaScript 编译器
-- sass-loader - Sass 加载器
+## Screenshots
 
-### 开发环境
-- Node.js >= 14.0.0
-- npm 包管理器
-- Chrome 浏览器 (推荐)
+![King of Disgust Preview](src/assets/Bg.gif)
 
-## 环境依赖
+适合用在这些场景：
 
-- Node.js >= 14.0.0
-- Vue 3.2.13
-- ECharts 5.5.1
-- DataV 2.10.0
-- Element Plus 2.4.0
-- Axios 1.7.9
+- 快速查看一个开源仓库最近是否活跃
+- 在课程、汇报、路演中展示项目数据
+- 为自己的仓库 README 提供一个可点击进入的可视化入口
+- 对比不同 GitHub 项目的社区活跃度和协作情况
 
+## Features
 
-## 功能特性
+- 仓库级数据大屏：输入 `owner/repo` 即可切换目标仓库
+- 多维指标展示：聚合展示 Star、Fork、Issue、PR 等核心数据
+- 趋势与活跃度分析：通过图表查看时间变化与项目波动
+- 贡献者词云：快速识别高频贡献者与社区参与情况
+- 代码变更统计：直观看到提交与改动节奏
+- 大屏布局：适合投屏、演示、展示墙和课堂场景
+- 分享友好：自动生成 README 徽章、链接和可访问 URL
 
-1. 数据展示
-   - Star、Fork、Issue、PR 等核心指标实时展示
-   - 数据液体填充效果
-   - 自适应布局设计
+## What It Shows
 
-2. 图表展示
-   - 时间序列分布图
-   - 代码变更统计图
-   - 贡献者词云图
-   - 项目活跃度分析
+项目当前主要包含以下可视化内容：
 
-3. 交互功能
-   - 项目搜索和切换
-   - 图表数据联动
-   - 自适应缩放
+- 核心仓库指标总览
+- 活跃度卡片图表
+- 贡献者词云
+- 趋势流图
+- 代码变更统计
+- 活跃度/降雨式分布图
 
-## 使用说明
+这些视图适合回答几个常见问题：
 
-### 获取项目
-```bash
-# 克隆项目
-git clone https://github.com/0213cc/king_of_disgust.git
+- 这个仓库最近是不是还在持续维护？
+- 社区讨论和协作是否活跃？
+- 最近的代码变更是否集中或稳定？
+- 主要贡献者和参与者是谁？
 
-# 进入项目目录
-cd vue-bigscreen
-```
+## How To Use
 
-### 安装和运行
-```bash
-# 安装依赖
-npm install
+如果你只是想使用这个项目，而不是参与开发，流程非常简单：
 
-# 开发环境运行
-npm run serve
+1. 打开页面
+2. 输入或拼接目标仓库名，格式为 `owner/repo`
+3. 直接查看交互式数据大屏
+4. 需要分享时，使用页面右下角的“分享”按钮生成链接或徽章
 
-# 打包构建
-npm run build
-```
-
-### 开发注意事项
-1. 确保已安装 Node.js (>= 14.0.0)
-2. 如果安装依赖过程中出现问题，可以尝试：
-   ```bash
-   # 清除 npm 缓存
-   npm clean cache -f
-   
-   # 使用 cnpm 安装
-   npm install -g cnpm --registry=https://registry.npm.taobao.org
-   cnpm install
-   ```
-
-### 项目预览
-- 开发环境：访问 `http://localhost:8080`
-- 推荐浏览器：Chrome
-- 显示问题：请自行调整浏览器窗口的宽高比。
-
-### GitHub Pages 分享
-
-项目支持部署到 GitHub Pages，并通过 URL 参数为任意 Github 仓库生成交互式大屏：
+支持通过 URL 直接指定仓库：
 
 ```text
 https://<github-user>.github.io/<repo-name>/#/?repo=<owner>/<repo>
@@ -122,32 +96,50 @@ https://<github-user>.github.io/<repo-name>/#/?repo=<owner>/<repo>
 https://0213cc.github.io/king_of_disgust/#/?repo=ant-design/ant-design
 ```
 
-其他用户可以在 README 中放一个徽章或链接，点击后跳转到可交互大屏：
+## README Share
+
+如果你希望在自己的仓库 README 中放一个可视化入口，可以直接使用徽章或普通链接。
+
+徽章示例：
 
 ```md
 [![OpenDigger Dashboard](https://img.shields.io/badge/OpenDigger-Dashboard-6c07f1)](https://0213cc.github.io/king_of_disgust/#/?repo=ant-design/ant-design)
 ```
 
-部署和使用说明见：[GitHub Pages 交互式大屏分享方案](docs/github-pages-share.md)。
+普通链接示例：
 
-## 项目特点
+```md
+[查看 ant-design/ant-design 交互式数据大屏](https://0213cc.github.io/king_of_disgust/#/?repo=ant-design/ant-design)
+```
 
-1. 响应式设计
-   - 使用 vw、vh 等相对单位
-   - 支持各种分辨率自适应
+更完整的分享说明见 [docs/github-pages-share.md](/Users/heail/dase/king_of_disgust/docs/github-pages-share.md)。
 
-2. 性能优化
-   - 组件按需加载
-   - 图表性能优化
-   - 数据缓存处理
+## Why This Project
 
-3. 代码规范
-   - ESLint 规范
-   - 组件化开发
-   - TypeScript 支持
+很多 GitHub 仓库数据工具更偏表格化、搜索式或分析页风格，而这个项目更强调：
 
-## 注意事项
+- 一屏展示
+- 演示友好
+- 视觉聚合
+- 低门槛分享
 
-1. 确保网络能够访问 Github API
-2. 建议使用 Chrome 浏览器访问
-3. 推荐使用 1920*1080 及以上分辨率
+它不是为了替代 GitHub 原生页面，而是为了在“展示”和“快速理解”这个场景下提供更强的可视化表达。
+
+## Tech Stack
+
+
+- Vue 3
+- Vue Router
+- Vuex
+- ECharts
+- DataV
+- Element Plus
+- Axios
+
+## Notes
+
+- 数据展示依赖 OpenDigger 相关接口可正常访问
+- 推荐使用桌面端浏览器访问，展示效果更稳定
+- 更适合在大屏、宽屏或投影场景下浏览
+
+
